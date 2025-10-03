@@ -1,11 +1,12 @@
-import userModel from "../models/userModel"
+import userModel from "../models/userModel.js"
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 
 export const register = async (req, res)=>{
+    const {username, email, password}= req.body;
 
-    if(!name || !email || !password ){
+    if(!username || !email || !password ){
         return res.json({success: false, message: 'required fields missing'})
     }
 
@@ -19,10 +20,10 @@ export const register = async (req, res)=>{
     
         }
         const hashedPassword= await bcrypt.hash(password, 10)
-        const user= new userModel({name, email, password: hashedPassword})
+        const user= new userModel({username, email, password: hashedPassword})
         await user.save()
 
-        const token= jwt.sign({id: user._id}, process.env.SECRETKEY, {expiresIn: '7d'})
+        const token= jwt.sign({id: user._id}, process.env.SECRET_KEY, {expiresIn: '7d'})
 
         res.cookie('token', token,{
             httpOnly: true,
@@ -61,7 +62,7 @@ export const login= async(req, res) =>{
         }
 
 
-        const token= jwt.sign({id: user._id}, process.env.SECRETKEY, {expiresIn: '7d'})
+        const token= jwt.sign({id: user._id}, process.env.SECRET_KEY, {expiresIn: '7d'})
 
             res.cookie('token', token,{
                 httpOnly: true,
